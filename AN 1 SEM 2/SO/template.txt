@@ -1,0 +1,92 @@
+
+///DIRECTOARE////
+#include <dirent.h>
+
+int main(){
+    DIR *dir;
+    struct dirent *de;
+    if(dd=(opendir(nume_dir))==NULL){
+        //..........
+        ;
+    }
+    while((de=readdir(dd))!=NULL){
+
+    }
+    closedir(dd);
+}
+
+
+///CITIRE///
+
+int main(){
+    int fd;
+    unsigned char c;
+    if(-1== open(fd,O_RDONLY)){
+        //.....
+        ;
+    }
+    while(1){
+        if(-1==read(fd,&c,1)){
+            //.....
+            ;
+        }
+        if(c=='\n' || c==EOF){
+            break;
+        }
+        //do smth
+    }
+}
+
+
+///FORK--PIPE///
+
+int p[2];
+pid_t pid;
+if(-1==pipe(p)){
+    //.....
+}
+
+if((pid=fork())==-1)
+{
+perror("Eroare la fork");
+exit(1);
+}
+else if(pid==0)
+{
+   //fiu
+   return 0;
+}
+else
+{
+//tata
+}
+
+
+///LOCK////
+#include <fcntl.h>
+
+int main(){
+struct flock lock;
+lock.l_len; //lungimea portiunii blocate in octeti
+lock.l_pid;//usualy nope;
+lock.l_start; //pozitia in raport cu originea
+lock.l_type; //tipul blocarii *F_RDLCK, F_WRLCK, F_UNLCK //deblocaj*
+lock.l_whence; //pozitia relativa*originea), *SEEK_SET, SEEK_CUR, SEEK_END)
+
+if(-1==fcntl(FD,F_SETLK/F_SETLKW,&lock){
+    .......
+}
+
+return 0;
+}
+
+
+///FIFO////
+
+int main(){
+    if(-1==mkfifo(nume,0600)){ //nu deschide niciun capat
+        //.....
+    }
+}
+
+

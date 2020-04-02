@@ -1,0 +1,135 @@
+ssh ada.mocanu@students.info.uaic.ro:p1.sh .
+
+functii importante:
+
+//
+
+
+//CREAT//
+fcntl.h
+
+int creat (char* nume_cale, int perm_access) 
+	return : -1 sau descriptorul fisierului 
+S_IRWXU-0700  S_IRWXG-0070  S_IRWXO-0007
+S_IRUSR-0400  S_IRGRP-0040  S_IROTH-0004
+S_IWUSR-0200  S_IWGRP-0020  S_IWOTH-0002
+S_IXUSR-0100  S_IXGRP-0010  S_IXOTH-0001
+
+
+//ACCESS//
+int access (char* nume_cale, int drept)
+	//drept: dreptul de acces ce se verifica: 1 - ex, 2-write, 4-write, 0-daca exista
+	return: 0 - accesul este permis / -1 eroare
+//X_OK(=1),W_OK(=2),R_OK(=4),F_OK(=0)-VERIF EXISTANTA FIS
+
+//OPEN//
+int open(char* nume_cale, int tip_desch, int perm_access)
+	//perm_access - doar cand e utilizat pt creare
+	//tip_desch: O_RDONLY, O_WRONLY, O_RDWR, O_APPEND, O_CREAT, O_TRUNC, O_EXCL
+	return: -1 sau descriptorul fisierului
+
+//CLOSE//
+int close(int df)
+	return: -1 sau 0
+
+//READ//
+int read(int df, char* buffer, unsigned nr_oct)
+	return:nr octeti cititi sau -1
+
+//WRITE//
+int write(int df, char* buffer, unsigned nr_oct)
+	return:nr de octeti scrisi sau -1
+
+//LSEEK//
+long lseek(int df, long val_ajust, int mod_ajust)
+//mod_ajust: 0 - inceputul fisierului- SEEK_SET
+		     1 - deplasament curent- SEEK_CUR
+		     2 - sf fisierului	- SEEK_END
+	return: noul deplasament fata de 0 sau -1
+
+//DUP//
+dup sau dup2 -> duplicarea unui descriptor de fisier
+
+//MKFIFO//
+unistd.h
+
+int mkfifo(char* nume_cale, int perm_acces)
+	-nume_cale->numele fisierului fifo ce se creeaza
+	-perm_acces->drepturile de acces pentru acesta
+	return 0 sau -1
+
+
+****LACATE***
+-------------
+
+struct flock
+{
+   short l_type; //tipul blocarii *F_RDLCK, F_WRLCK, F_UNLCK //deblocaj*
+   short l_whence; //pozitia relativa*originea), *SEEK_SET, SEEK_CUR, SEEK_END)
+   long l_start; //pozitia in raport cu originea
+   long l_len; //lungimea portiunii blocate in octeti
+   int l_pid;
+} 
+
+dupa ce se completeaza, se apeleaza functia fcntl:
+int fcntl(int fd, int modd, struct flock* slf)
+mod: modul de punere: 
+              F_SETLK (esec: EACCES sau EAGAIN)
+		      F_GETLK (extrage info despre un lacat pus pe fisier)
+		      F_SETLKW (punerea/scoaterea blocajelor in mod blocant, se asteapta pna se pe une blocajul)
+
+
+****FORK****
+------------
+unistd.h
+
+pid_t fork(void) -> se creeaza o copie a procesului apelant si ambele procese isi vor continu executia cu urmatoarea instructiune
+	return -1 sau n, in procesul tata, n=PID noului proces creat
+		      0, in procesul fiu
+sincronizarea proceselor : wait //sys/types.h si sys/wait.h
+			pid_t wait(int* stat_loc)
+			returneaza: pid-ul fiului, si prin stat_loc->valoarea de terminare a acelui proces fiu
+
+
+
+****EXEC****
+------------
+fcntl.h
+unistd.h
+
+a) numar de parametri variabil
+b) numar de parametri fix
+
+a)int execl(char* ref, char* argv0->coincide cu ref, ..., char* argvN->NULL) "/bin/ls"
+b)int execv(char* ref, char* argv[]) // ref -> numele procesului, cale absoluta sau relativa 
+
+a)int execle(char* ref, char* argv0,..., char*argvN, char* env[]) sameshit+enviorment
+b)int execve(char* ref, char* argv[], char* env[])
+
+a)int execlp(char* ref, char* argv0, ..., char* argvN) ref este cautat in PATH "ls"
+b)int execvp(char* ref, char* argv[])
+
+dup(fd)->cauta primul descriptor de fiser nefolosit si il redirecteaza catre descriptorul primit ca parametru
+
+****PIPE****
+------------
+ unistd.h
+
+int pipe(int *p) //p=parametrul efectiv de apel (int[2])->p[0]=descriptorul fisier deschis pt capatul de citire
+							  p[1]=descriptorul fisier deschis pt capatul de scriere
+return 0 sau -1
+
+****FIFO****
+------------
+//sys/types.h; 
+//sys/stat.h
+unistd.h
+
+mkfifo(char *nume_fis, permisiuni)
+mfnod (char *nume_fis, S_IFIFO | permisiuni, 0)
+return -1
+erori: 17/file exists
+
+
+
+
